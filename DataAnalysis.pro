@@ -10,11 +10,13 @@ CONFIG += c++17
 
 SOURCES += \
     datalist.cpp \
+    filereader.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     datalist.h \
+    filereader.h \
     mainwindow.h
 
 FORMS += \
