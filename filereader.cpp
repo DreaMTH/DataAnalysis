@@ -50,7 +50,7 @@ void FileReader::ReadFromFile()
             fileReader >> tempString;
             this->output->append(tempString);
         }
-        this->output->removeLast();
+        //this->output->removeLast();
     }else{
         fileReader.open(this->defaultErrorPath, std::ios_base::app | std::ios_base::out);
         fileReader << "Error with reading file";

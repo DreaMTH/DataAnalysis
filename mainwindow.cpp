@@ -4,6 +4,8 @@
 #include "filereader.h"
 #include <QFileDialog>
 #include <string>
+#include <fstream>
+#include <QTextStream>
 #define TEST
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -11,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     this->_pathForFile = "";
     ui->setupUi(this);
+    ui->spinBox->setValue(1);
     list = new DataList();
 #ifdef TEST
 
@@ -39,6 +42,8 @@ void MainWindow::on_pushButton_2_clicked()
     reader.SetOutput(vector);
     reader.SetPath(this->_pathForFile.toStdString());
     reader.ReadFromFile();
+    int columnCountTable = vector.length() / this->ui->spinBox->value();
+    /*
     QVector<float> tempA = *new QVector<float>();
     QVector<float> tempB = *new QVector<float>();
     for(int i = 0; i < vector.size(); i++){
@@ -49,18 +54,21 @@ void MainWindow::on_pushButton_2_clicked()
         }else if(i == 0){
             tempA.push_back(std::stof(vector[i]));
         }
-
-
-
-
     }
-    this->ui->tableWidget->setColumnCount(tempA.size());
-    this->ui->tableWidget->setRowCount(2);
-    this->list->push_back(0, tempA);
-    this->list->push_back(1, tempB);
+    */
+    int counterOverStep = this->ui->spinBox->value();
+    for(int i = 0; i < this->ui->spinBox->value(); i++){
+        QVector<float> *tempVect = new QVector<float>();
+        for(int j = i; j < vector.length(); j+=counterOverStep){
+            tempVect->push_back(std::stof(vector[j]));
+        }
+        list->push_back(i, *tempVect);
+    }
 
-    for(int i = 0; i < this->list->Size(); i++){
-        for(int j = 0; j < tempA.size(); j++){
+    this->ui->tableWidget->setColumnCount(columnCountTable);
+    this->ui->tableWidget->setRowCount(this->ui->spinBox->value());
+    for(int i = 0; i < this->ui->spinBox->value(); i++){
+        for(int j = 0; j < columnCountTable; j++){
             this->ui->tableWidget->setItem(i,j, new QTableWidgetItem(QString::number(this->list->at(i,j))));
         }
     }
