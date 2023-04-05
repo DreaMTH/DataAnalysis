@@ -10,6 +10,10 @@ public:
     DataList(int size);
     void push_back(int propI, QVector<float> values);
     float at(int propI, int valueI);
+    int Size();
+    QVector<float> operator[](const int index);
+    int GetVectorSize(int index);
+    int ItemsSize();
 private:
     class Node{
     public:
@@ -22,6 +26,7 @@ private:
             this->next = nxt;
         }
     };
+    int LessSize();
     Node* m_head;
     int _size;
 };

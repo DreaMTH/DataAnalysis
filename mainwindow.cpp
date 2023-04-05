@@ -4,14 +4,17 @@
 #include "filereader.h"
 #include <QFileDialog>
 #include <string>
-
+#define TEST
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     this->_pathForFile = "";
     ui->setupUi(this);
+    list = new DataList();
+#ifdef TEST
 
+#endif
 
 }
 
@@ -31,7 +34,6 @@ void MainWindow::on_pushButton_2_clicked()
 {
 
     this->_pathForFile = QFileDialog::getOpenFileName(this, "Choose datas", "C:\\");
-    DataList list = DataList();
     QVector<std::string> vector;
     FileReader reader;
     reader.SetOutput(vector);
@@ -54,12 +56,14 @@ void MainWindow::on_pushButton_2_clicked()
     }
     this->ui->tableWidget->setColumnCount(tempA.size());
     this->ui->tableWidget->setRowCount(2);
-    list.push_back(0, tempA);
-    list.push_back(1, tempB);
-    for(int i = 0; i < 2; i++){
-        for(int j = 0; j < tempA.size() - 1; j++){
-            this->ui->tableWidget->setItem(i,j, new QTableWidgetItem(QString::number(list.at(i,j))));
+    this->list->push_back(0, tempA);
+    this->list->push_back(1, tempB);
+
+    for(int i = 0; i < this->list->Size(); i++){
+        for(int j = 0; j < tempA.size(); j++){
+            this->ui->tableWidget->setItem(i,j, new QTableWidgetItem(QString::number(this->list->at(i,j))));
         }
     }
+
 }
 
