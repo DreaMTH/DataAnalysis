@@ -47,9 +47,10 @@ void FileReader::ReadFromFile()
     if(fileReader.is_open()){
         while(!fileReader.eof()){
             std::string tempString = "";
-            std::getline(fileReader, tempString);
+            fileReader >> tempString;
             this->output->append(tempString);
         }
+        this->output->removeLast();
     }else{
         fileReader.open(this->defaultErrorPath, std::ios_base::app | std::ios_base::out);
         fileReader << "Error with reading file";
@@ -58,7 +59,5 @@ void FileReader::ReadFromFile()
 
 FileReader::~FileReader()
 {
-    delete this->output;
-    this->input.clear();
-    this->input.detach();
+
 }

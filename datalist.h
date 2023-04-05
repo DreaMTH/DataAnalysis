@@ -16,7 +16,7 @@ private:
         int propIndex;
         QVector<float> values;
         Node* next;
-        Node(int pIndex, QVector<float> val, Node *nxt = nullptr){
+        Node(int pIndex, QVector<float> &val, Node *nxt = nullptr){
             this->propIndex = pIndex;
             this->values = val;
             this->next = nxt;

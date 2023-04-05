@@ -13,8 +13,8 @@ DataList::DataList(int size){
 void DataList::push_back(int propI, QVector<float> values)
 {
     if(this->m_head != nullptr){
-        Node *currentNode = this->m_head;
-        while (currentNode != nullptr) {
+        DataList::Node *currentNode = this->m_head;
+        while (currentNode->next != nullptr) {
             currentNode = currentNode->next;
         }
         currentNode->next = new DataList::Node(propI, values);

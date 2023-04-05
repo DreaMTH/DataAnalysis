@@ -138,6 +138,13 @@ background-color: rgb(215, 255, 193);
             </property>
            </spacer>
           </item>
+          <item row="3" column="1">
+           <widget class="QPushButton" name="pushButton_2">
+            <property name="text">
+             <string>Browse...</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
         <widget class="QWidget" name="page_2"/>
