@@ -11,9 +11,10 @@ public:
     void push_back(int propI, QVector<float> values);
     float at(int propI, int valueI);
     int Size();
-    QVector<float> operator[](const int index);
+    QVector<float>& operator[](const int index);
     int GetVectorSize(int index);
     int ItemsSize();
+    void clear();
 private:
     class Node{
     public:

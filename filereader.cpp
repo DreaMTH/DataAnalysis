@@ -59,5 +59,5 @@ void FileReader::ReadFromFile()
 
 FileReader::~FileReader()
 {
-
+    output->clear();
 }

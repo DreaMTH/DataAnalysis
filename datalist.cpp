@@ -1,5 +1,6 @@
 #include "datalist.h"
 #include <stdexcept>
+#include <QException>
 DataList::DataList()
 {
     this->_size = 0;
@@ -46,25 +47,18 @@ int DataList::Size()
     return this->_size;
 }
 
-QVector<float> DataList::operator [](const int index)
+QVector<float> &DataList::operator [](const int index)
 {
-    if(index == 0){
-        return this->m_head->values;
-    }else if(index > this->_size){
-        throw std::out_of_range("DataList: index is out of range");
-    }else if(index < 0){
-        throw std::invalid_argument("DataList: index is sub zero");
-    }else{
+    int counter = 0;
     Node *currentNode = this->m_head;
-    for(int i = 0; i <= index; i++){
-        if(currentNode->next != nullptr){
-        currentNode = currentNode->next;
-        }else{
-            throw std::current_exception();
+    while(currentNode != nullptr){
+        if(counter == index){
+            return currentNode->values;
         }
+        currentNode = currentNode->next;
+        counter++;
     }
-    return currentNode->values;
-    }
+    throw QException();
 }
 
 int DataList::GetVectorSize(int index)
@@ -87,6 +81,11 @@ int DataList::GetVectorSize(int index)
 int DataList::ItemsSize()
 {
     return this->LessSize();
+}
+
+void DataList::clear()
+{
+
 }
 
 int DataList::LessSize()
