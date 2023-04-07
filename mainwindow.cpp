@@ -67,6 +67,7 @@ void MainWindow::on_pushButton_2_clicked()
             this->ui->tableWidget->setItem(i,j, new QTableWidgetItem(QString::number(this->list->at(i,j))));
         }
     }
+
     }catch(QException &ex){
         QMessageBox *exceptionMBox = new QMessageBox(this);
         exceptionMBox->setText("Some exception with filling data has been occured\nu can find more information in log file");
