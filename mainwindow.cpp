@@ -7,6 +7,7 @@
 #include <fstream>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QScrollBar>
 #include <QException>
 #define TEST
 MainWindow::MainWindow(QWidget *parent)
@@ -16,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->_pathForFile = "";
     ui->setupUi(this);
     ui->spinBox->setValue(1);
+    this->ui->tableWidget->horizontalScrollBar()->setStyleSheet("QScrollBar:horizontal {border: 2px grey;background: #32CC99; height: 25px;}");
 
 #ifdef TEST
     QPixmap bkgnd("D:\\QtLearning\\chartTest\build-DataAnalysis-Desktop_Qt_6_4_2_MinGW_64_bit-Debug\\Grey-paper.png");
