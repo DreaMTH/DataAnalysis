@@ -15,6 +15,10 @@ public:
     int GetVectorSize(int index);
     int ItemsSize();
     void clear();
+    //calc methods
+    QVector<float> GetH();
+    QVector<QVector<float>> GetClasses();
+    QVector<int> GetM();
 private:
     class Node{
     public:
@@ -30,6 +34,7 @@ private:
     int LessSize();
     Node* m_head;
     int _size;
+
 };
 
 #endif // DATALIST_H

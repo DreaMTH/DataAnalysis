@@ -49,16 +49,15 @@ int DataList::Size()
 
 QVector<float> &DataList::operator [](const int index)
 {
-    int counter = 0;
-    Node *currentNode = this->m_head;
-    while(currentNode != nullptr){
-        if(counter == index){
-            return currentNode->values;
+    if(index > this->_size){
+        throw("invalid operation. bounds array");
+    }else{
+        Node *currentNode = this->m_head;
+        for(int i = 0; i < index; i++){
+            currentNode = currentNode->next;
         }
-        currentNode = currentNode->next;
-        counter++;
+        return currentNode->values;
     }
-    throw QException();
 }
 
 int DataList::GetVectorSize(int index)
@@ -86,6 +85,57 @@ int DataList::ItemsSize()
 void DataList::clear()
 {
 
+}
+
+QVector<float> DataList::GetH()
+{
+    QVector<float> classsSizes;
+    float h;
+    int currentSize;
+    for(int i = 0; i < this->_size; i++){
+        int m;
+        currentSize = this[0][i].size();
+        if(currentSize <= 100){
+            m = (int)std::sqrt(currentSize);
+        }else{
+            m = (int)std::cbrt(currentSize);
+        }
+        h = (this[0][i].last() - this[0][i].first()) / m;
+        classsSizes.push_back(h);
+    }
+    return classsSizes;
+}
+
+QVector<QVector<float> > DataList::GetClasses()
+{
+    QVector<QVector<float> > classes;
+    QVector<float> classSizes = this->GetH();
+    QVector<int> M = this->GetM();
+    for(int i = 0; i < M.size(); i++){
+        for(int j = 0; j < M[i]; j++){
+            if(j != 0){
+                classes[i].push_back(classes[i][j-1] + classSizes[i]);
+            }else{
+                classes[i].push_back(this[0][i].first());
+            }
+        }
+
+    }
+    return classes;
+}
+
+QVector<int> DataList::GetM()
+{
+    QVector<int> m;
+    for(int i = 0; i < this->_size; i++){
+        int currentSize = this[0][i].size();
+        if(currentSize <= 100){
+            m.push_back((int)std::sqrt(currentSize));
+        }else{
+            m.push_back((int)std::cbrt(currentSize));
+        }
+    }
+    return m;
 }
 
 int DataList::LessSize()
