@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -50,6 +53,9 @@ QScrollBar::sub-line:vertical {
     subcontrol-position: left;
     subcontrol-origin: margin;
 }</string>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -229,7 +235,7 @@ font: 10pt &quot;Segoe UI&quot;;
           <item row="0" column="2">
            <layout class="QGridLayout" name="gridLayout_5">
             <item row="0" column="0">
-             <widget class="QWidget" name="widget" native="true">
+             <widget class="QCustomPlot" name="histoPlot" native="true">
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
@@ -239,7 +245,7 @@ font: 10pt &quot;Segoe UI&quot;;
              </widget>
             </item>
             <item row="1" column="0">
-             <widget class="QWidget" name="widget_2" native="true"/>
+             <widget class="QCustomPlot" name="fxPlot" native="true"/>
             </item>
            </layout>
           </item>
@@ -277,6 +283,14 @@ font: 10pt &quot;Segoe UI&quot;;
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

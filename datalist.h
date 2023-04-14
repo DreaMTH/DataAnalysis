@@ -1,3 +1,4 @@
+#include <QPointF>
 #include <QVector>
 #ifndef DATALIST_H
 #define DATALIST_H
@@ -17,8 +18,9 @@ public:
     void clear();
     //calc methods
     QVector<float> GetH();
-    QVector<QVector<float>> GetClasses();
+    QVector<float> GetClassesAt(const int index);
     QVector<int> GetM();
+    QVector<float> histoBulding(const int index);
 private:
     class Node{
     public:

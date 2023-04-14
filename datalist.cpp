@@ -1,6 +1,7 @@
 #include "datalist.h"
 #include <stdexcept>
 #include <QException>
+
 DataList::DataList()
 {
     this->_size = 0;
@@ -90,36 +91,32 @@ void DataList::clear()
 QVector<float> DataList::GetH()
 {
     QVector<float> classsSizes;
+
     float h;
-    int currentSize;
+    auto Ms = this->GetM();
     for(int i = 0; i < this->_size; i++){
-        int m;
-        currentSize = this[0][i].size();
-        if(currentSize <= 100){
-            m = (int)std::sqrt(currentSize);
-        }else{
-            m = (int)std::cbrt(currentSize);
-        }
-        h = (this[0][i].last() - this[0][i].first()) / m;
+        int m = Ms[i];
+        QVector<float> copiedAndSorted = this[0][i];
+        std::sort(copiedAndSorted.begin(), copiedAndSorted.end());
+        h = (copiedAndSorted.last() - copiedAndSorted.first()) / m;
         classsSizes.push_back(h);
     }
     return classsSizes;
 }
 
-QVector<QVector<float> > DataList::GetClasses()
+QVector<float> DataList::GetClassesAt(const int index)
 {
-    QVector<QVector<float> > classes;
-    QVector<float> classSizes = this->GetH();
-    QVector<int> M = this->GetM();
-    for(int i = 0; i < M.size(); i++){
-        for(int j = 0; j < M[i]; j++){
-            if(j != 0){
-                classes[i].push_back(classes[i][j-1] + classSizes[i]);
-            }else{
-                classes[i].push_back(this[0][i].first());
-            }
+    QVector<float> classes;
+    auto temporaryChecker = this[0][index];
+    std::sort(temporaryChecker.begin(), temporaryChecker.end());
+    float classSizes = this->GetH().at(index);
+    int M = this->GetM().at(index);
+    for(int i = 0; i < M; i++){
+        if(i != 0){
+            classes.push_back(classes.at(i - 1) + classSizes);
+        }else{
+            classes.push_back(temporaryChecker.first()+classSizes);
         }
-
     }
     return classes;
 }
@@ -136,6 +133,30 @@ QVector<int> DataList::GetM()
         }
     }
     return m;
+}
+
+QVector<float> DataList::histoBulding(const int index)
+{
+    QVector<float> result;
+    QVector<float> copiedAndSorted = this[0][index];
+    std::sort(copiedAndSorted.begin(), copiedAndSorted.end());
+    auto classes = this->GetClassesAt(index);
+    for(int i = 0; i < classes.length(); i++){
+        float tempProb = 0;
+        for(int j = 0; j < this[0][index].length(); j++){
+            if(i != 0){
+                if(copiedAndSorted.at(j) > classes[i-1] && copiedAndSorted.at(j) <= classes[i]){
+                    tempProb++;
+                }
+            }else{
+                if(copiedAndSorted.at(j) <= classes[i]){
+                    tempProb++;
+                }
+            }
+        }
+        result.push_back(tempProb / this[0][index].length());
+    }
+    return result;
 }
 
 int DataList::LessSize()
