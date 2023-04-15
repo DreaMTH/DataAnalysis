@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "datalist.h"
 #include <QMouseEvent>
+#include "qcustomplot.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -28,5 +29,6 @@ private:
     Ui::MainWindow *ui;
     QString _pathForFile;
     DataList *list;
+    QCPBars *myBars;
 };
 #endif // MAINWINDOW_H
