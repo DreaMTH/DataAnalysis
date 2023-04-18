@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QException>
+#include <QKeyEvent>
 #define TEST
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -47,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
         connect(this->ui->pushButton_3, &QPushButton::clicked, this, [=]() {
             ui->stackedWidget->setCurrentIndex(0);
     });
+
 }
 
 MainWindow::~MainWindow()
@@ -60,7 +62,6 @@ void MainWindow::on_pushButton_clicked()
     this->ui->stackedWidget->setCurrentIndex(1);
 }
 
-
 void MainWindow::on_pushButton_2_clicked()
 {
     this->ui->tableWidget->reset();
@@ -68,7 +69,6 @@ void MainWindow::on_pushButton_2_clicked()
     this->ui->histoPlot->clearPlottables();
     this->ui->fxPlot->clearPlottables();
     this->ui->spinBox_2->setMaximum(this->ui->spinBox->value());
-    int currentVector = this->ui->spinBox_2->value() - 1;
     list = new DataList();
     this->_pathForFile = QFileDialog::getOpenFileName(this, "Choose datas", "C:\\");
     if(_pathForFile.isEmpty()){
@@ -87,21 +87,20 @@ void MainWindow::on_pushButton_2_clicked()
     int columnCountTable = vector.length() / this->ui->spinBox->value();
     int counterOverStep = this->ui->spinBox->value();
     try {
-    for(int i = 0; i < this->ui->spinBox->value(); i++){
-        QVector<float> *tempVect = new QVector<float>();
-        for(int j = i; j < vector.length(); j+=counterOverStep){
-            tempVect->push_back(std::stof(vector[j]));
+        for(int i = 0; i < this->ui->spinBox->value(); i++){
+            QVector<float> *tempVect = new QVector<float>();
+            for(int j = i; j < vector.length(); j+=counterOverStep){
+                tempVect->push_back(std::stof(vector[j]));
+            }
+            list->push_back(i, *tempVect);
         }
-        list->push_back(i, *tempVect);
-    }
-    this->ui->tableWidget->setColumnCount(columnCountTable);
-    this->ui->tableWidget->setRowCount(this->ui->spinBox->value());
-    for(int i = 0; i < this->ui->spinBox->value(); i++){
-        for(int j = 0; j < columnCountTable; j++){
-            this->ui->tableWidget->setItem(i,j, new QTableWidgetItem(QString::number(this->list->at(i,j))));
+        this->ui->tableWidget->setColumnCount(columnCountTable);
+        this->ui->tableWidget->setRowCount(this->ui->spinBox->value());
+        for(int i = 0; i < this->ui->spinBox->value(); i++){
+            for(int j = 0; j < columnCountTable; j++){
+                this->ui->tableWidget->setItem(i,j, new QTableWidgetItem(QString::number(this->list->at(i,j))));
+            }
         }
-    }
-    qDebug() << list[0][currentVector];
     }catch(QException &ex){
         QMessageBox *exceptionMBox = new QMessageBox(this);
         exceptionMBox->setText("Some exception with filling data has been occured\nu can find more information in log file");
@@ -112,6 +111,55 @@ void MainWindow::on_pushButton_2_clicked()
             exceptionLog.write(ex.what());
         }
     }
+    this->plotGraphs();
+    this->ApploadData();
+}
+
+void MainWindow::setToolTipFx(QMouseEvent *event)
+{
+
+    QToolTip::showText(*new QPoint(event->globalPosition().x(), event->globalPosition().y()-32),QString("%1, %2")
+                    .arg(ui->fxPlot->xAxis->pixelToCoord(event->pos().x())).arg(ui->fxPlot->yAxis->pixelToCoord(event->pos().y())));
+
+}
+void MainWindow::setToolTipHysto(QMouseEvent *event)
+{   
+
+    QToolTip::showText(*new QPoint(event->globalPosition().x(), event->globalPosition().y()-32),QString("%1, %2")
+                                                                                                    .arg(ui->histoPlot->xAxis->pixelToCoord(event->pos().x())).arg(ui->histoPlot->yAxis->pixelToCoord(event->pos().y())));
+
+}
+
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    qDebug() << event->key();
+    switch (event->key()) {
+    case Qt::Key_R:
+        if(event->modifiers().testFlag(Qt::ControlModifier)){
+            this->plotGraphs();
+        }
+        break;
+    case Qt::Key_Return | Qt::Key_Enter:
+        if(event->modifiers().testFlag(Qt::AltModifier)){
+
+            if(!this->isFullScreen()){
+                this->setWindowState(Qt::WindowFullScreen);
+            }else{
+                this->setWindowState(Qt::WindowNoState);
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+void MainWindow::plotGraphs()
+{
+    this->ui->histoPlot->clearPlottables();
+    this->ui->fxPlot->clearPlottables();
+    int currentVector = this->ui->spinBox_2->value() - 1;
     auto values = list->GetClassesAt(currentVector);
     auto Prob = list->histoBulding(currentVector);
     this->myBars = new QCPBars(this->ui->histoPlot->xAxis, this->ui->histoPlot->yAxis);
@@ -151,18 +199,19 @@ void MainWindow::on_pushButton_2_clicked()
     this->ui->fxPlot->replot();
 }
 
-void MainWindow::setToolTipFx(QMouseEvent *event)
+void MainWindow::ApploadData()
 {
-
-    QToolTip::showText(*new QPoint(event->globalPosition().x(), event->globalPosition().y()-32),QString("%1, %2")
-                    .arg(ui->fxPlot->xAxis->pixelToCoord(event->pos().x())).arg(ui->fxPlot->yAxis->pixelToCoord(event->pos().y())));
+    this->ui->plainTextEdit->clear();
+    for(int i = 0; i < this->list->Size(); i++){
+        this->ui->plainTextEdit->appendPlainText(this->ConcatinatingDatas(i));
+    }
 
 }
-void MainWindow::setToolTipHysto(QMouseEvent *event)
-{   
 
-    QToolTip::showText(*new QPoint(event->globalPosition().x(), event->globalPosition().y()-32),QString("%1, %2")
-                                                                                                    .arg(ui->histoPlot->xAxis->pixelToCoord(event->pos().x())).arg(ui->histoPlot->yAxis->pixelToCoord(event->pos().y())));
-
+QString MainWindow::ConcatinatingDatas(const int index)
+{
+    return QString("%0 Vecter Params:\n\tMu = %1\n\tSigma = %2\n\tMedian = %3")
+        .arg(index).arg(this->list->MuAt(index)).arg(this->list->SigmaAt(index))
+        .arg(this->list->Median(index));
 }
 

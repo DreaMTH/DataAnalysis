@@ -7,6 +7,7 @@
 class DataList
 {
 public:
+    /*standartListMethods*/
     DataList();
     DataList(int size);
     void push_back(int propI, QVector<float> values);
@@ -16,11 +17,18 @@ public:
     int GetVectorSize(int index);
     int ItemsSize();
     void clear();
-    //calc methods
+    /*end*/
+    /*calc methods*/
+    float MuAt(const int index, int order = 1);
+    float SigmaAt(const int index, int order = 2);
+    float Median(const int index);
+    /*end*/
+    /*DataVisualizationMethods*/
     QVector<float> GetH();
     QVector<float> GetClassesAt(const int index);
     QVector<int> GetM();
     QVector<float> histoBulding(const int index);
+    /*end*/
 private:
     class Node{
     public:

@@ -88,6 +88,33 @@ void DataList::clear()
 
 }
 
+float DataList::MuAt(const int index, int order)
+{
+    float result = 0.0f;
+    for(int i = 0; i < this[0][index].length(); i++){
+        result += std::pow(this[0][index].at(i), order);
+    }
+    return result / this[0][index].length();
+
+}
+
+float DataList::SigmaAt(const int index, int order)
+{
+    float mu = this->MuAt(index);
+    float result = 0.0f;
+    for(int i = 0; i < this[0][index].length(); i++){
+        result += std::pow(this[0][index].at(i) - mu, order);
+    }
+    return std::sqrt(result/this[0][index].length());
+}
+
+float DataList::Median(const int index)
+{
+    QVector<float> temporaryVector(this[0][index].length());
+    std::partial_sort_copy(std::begin(this[0][index]), std::end(this[0][index]), std::begin(temporaryVector), std::end(temporaryVector));
+    return temporaryVector.at((int)(temporaryVector.length() / 2));
+}
+
 QVector<float> DataList::GetH()
 {
     QVector<float> classsSizes;
