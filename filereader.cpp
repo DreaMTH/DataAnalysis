@@ -48,7 +48,12 @@ void FileReader::ReadFromFile()
         while(!fileReader.eof()){
             std::string tempString = "";
             fileReader >> tempString;
-            this->output->append(tempString);
+            try {
+                std::stof(tempString);
+                this->output->append(tempString);
+            } catch (std::exception&) {
+                continue;
+            }
         }
         //this->output->removeLast();
     }else{

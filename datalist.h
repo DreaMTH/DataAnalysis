@@ -21,7 +21,12 @@ public:
     /*calc methods*/
     float MuAt(const int index, int order = 1);
     float SigmaAt(const int index, int order = 2);
+    float VariatedMoment(const int index, int order = 3);
     float Median(const int index);
+    float MAD(const int index);
+    float ExscessCoef(const int index);
+    float AssymetryCoef(const int index);
+    QVector<float> Kvant(const int index);
     /*end*/
     /*DataVisualizationMethods*/
     QVector<float> GetH();

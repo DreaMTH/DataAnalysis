@@ -27,13 +27,14 @@ MainWindow::MainWindow(QWidget *parent)
     this->ui->spinBox_2->setToolTip("Number of single vector for reading");
     this->ui->stackedWidget->setCurrentIndex(0);
     this->ui->plainTextEdit->setPlainText("Test message");
-    this->ui->plainTextEdit->setEnabled(false);
     this->ui->fxPlot->setInteraction(QCP::iRangeZoom);
     this->ui->fxPlot->setInteraction(QCP::iRangeDrag);
     this->ui->histoPlot->setInteraction(QCP::iRangeDrag);
     this->ui->histoPlot->setInteraction(QCP::iRangeZoom);
     this->ui->tableWidget->verticalScrollBar()->setStyleSheet("QScrollBar:vertical {	border: none;    background: rgb(45, 45, 68);    width: 14px;    margin: 15px 0 15px 0;	border-radius: 0px; }QScrollBar::handle:vertical {		background-color: rgb(80, 80, 122);	min-height: 30px;	border-radius: 7px;}QScrollBar::handle:vertical:hover{		background-color: rgb(255, 0, 127);}QScrollBar::handle:vertical:pressed {		background-color: rgb(185, 0, 92);}QScrollBar::sub-line:vertical {	border: none;	background-color: rgb(59, 59, 90);	height: 15px;	border-top-left-radius: 7px;	border-top-right-radius: 7px;	subcontrol-position: top;	subcontrol-origin: margin;}QScrollBar::sub-line:vertical:hover {		background-color: rgb(255, 0, 127);}QScrollBar::sub-line:vertical:pressed {		background-color: rgb(185, 0, 92);}/* BTN BOTTOM - SCROLLBAR */QScrollBar::add-line:vertical {	border: none;	background-color: rgb(59, 59, 90);	height: 15px;	border-bottom-left-radius: 7px;	border-bottom-right-radius: 7px;	subcontrol-position: bottom;	subcontrol-origin: margin;}QScrollBar::add-line:vertical:hover {		background-color: rgb(255, 0, 127);}QScrollBar::add-line:vertical:pressed {		background-color: rgb(185, 0, 92);}QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {	background: none;}QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {	background: none;}");
     this->ui->tableWidget->horizontalScrollBar()->setStyleSheet("QScrollBar:horizontal {	border: none;    background: rgb(45, 45, 68);    height: 14px;    margin: 0 15px 0 15px;	border-radius: 0px; }QScrollBar::handle:horizontal {		background-color: rgb(80, 80, 122);	min-width: 30px;	border-radius: 7px;}QScrollBar::handle:horizontal:hover{		background-color: rgb(255, 0, 127);}QScrollBar::handle:horizontal:pressed {		background-color: rgb(185, 0, 92);}QScrollBar::sub-line:horizontal {	border: none;	background-color: rgb(59, 59, 90);	width: 15px; border-top-left-radius: 7px; border-bottom-left-radius: 7px;	subcontrol-position: left;	subcontrol-origin: margin;}QScrollBar::sub-line:horizontal:hover {		background-color: rgb(255, 0, 127);}QScrollBar::sub-line:horizontal:pressed {		background-color: rgb(185, 0, 92);}QScrollBar::add-line:horizontal {	border: none;	background-color: rgb(59, 59, 90);	width: 15px;	border-top-right-radius: 7px;	border-bottom-right-radius: 7px;	subcontrol-position: right;	subcontrol-origin: margin;}QScrollBar::add-line:horizontal:hover {		background-color: rgb(255, 0, 127);}QScrollBar::add-line:horizontal:pressed {		background-color: rgb(185, 0, 92);}QScrollBar::left-arrow:horizontal, QScrollBar::right-arrow:horizontal {	background: none;}QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {	background: none;}");
+    this->ui->plainTextEdit->verticalScrollBar()->setStyleSheet(this->ui->tableWidget->verticalScrollBar()->styleSheet());
+    this->ui->plainTextEdit->horizontalScrollBar()->setStyleSheet(this->ui->tableWidget->horizontalScrollBar()->styleSheet());
 #ifdef TEST
     QPixmap bkgnd("D:\\QtLearning\\chartTest\build-DataAnalysis-Desktop_Qt_6_4_2_MinGW_64_bit-Debug\\Grey-paper.png");
         //bkgnd = bkgnd.scaled(this->size(), Qt::IgnoreAspectRatio);
@@ -173,7 +174,7 @@ void MainWindow::plotGraphs()
     QVector<QVector<QPointF> > buildModel = *new QVector<QVector<QPointF> >(values.length());
     float x1;
     float y1 = Prob[0];
-    float min = *std::min_element(list[0][currentVector].begin(), list[0][currentVector].end());
+    float min = *std::min_element((*this->list)[currentVector].begin(), (*this->list)[currentVector].end());
     for(int i = 0; i < values.length(); i++){
         if(i != 0){
             y1 += Prob[i];
@@ -201,17 +202,19 @@ void MainWindow::plotGraphs()
 
 void MainWindow::ApploadData()
 {
-    this->ui->plainTextEdit->clear();
+    this->ui->plainTextEdit->clear();  
     for(int i = 0; i < this->list->Size(); i++){
         this->ui->plainTextEdit->appendPlainText(this->ConcatinatingDatas(i));
     }
+
 
 }
 
 QString MainWindow::ConcatinatingDatas(const int index)
 {
-    return QString("%0 Vecter Params:\n\tMu = %1\n\tSigma = %2\n\tMedian = %3")
+    return QString("%0 Vecter Params:\n\tMu = %1\n\tSigma = %2\n\tMedian = %3\n\tMAD = %4\n\tAssymetry Coefficient = %5\n\tExcess Coefficient = %6\n\tIntervals:\n\t\t%7 < σ(x) <%8\n\t\t%9 < σ(S) < %10\n\t\t")
         .arg(index).arg(this->list->MuAt(index)).arg(this->list->SigmaAt(index))
-        .arg(this->list->Median(index));
+        .arg(this->list->Median(index)).arg(this->list->MAD(index)).arg(this->list->AssymetryCoef(index)).arg(this->list->ExscessCoef(index))
+        .arg(this->list->Kvant(index).at(0)).arg(this->list->Kvant(index).at(1)).arg(this->list->Kvant(index).at(2)).arg(this->list->Kvant(index).at(3));
 }
 

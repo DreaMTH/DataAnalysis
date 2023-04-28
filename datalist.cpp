@@ -91,10 +91,10 @@ void DataList::clear()
 float DataList::MuAt(const int index, int order)
 {
     float result = 0.0f;
-    for(int i = 0; i < this[0][index].length(); i++){
-        result += std::pow(this[0][index].at(i), order);
+    for(int i = 0; i < (*this)[index].length(); i++){
+    result += std::pow((*this)[index].at(i), order);
     }
-    return result / this[0][index].length();
+    return result / (*this)[index].length();
 
 }
 
@@ -102,17 +102,83 @@ float DataList::SigmaAt(const int index, int order)
 {
     float mu = this->MuAt(index);
     float result = 0.0f;
-    for(int i = 0; i < this[0][index].length(); i++){
-        result += std::pow(this[0][index].at(i) - mu, order);
+    for(int i = 0; i < (*this)[index].length(); i++){
+        result += std::pow((*this)[index].at(i) - mu, order);
     }
-    return std::sqrt(result/this[0][index].length());
+    return std::sqrt(result/(*this)[index].length());
+}
+
+float DataList::VariatedMoment(const int index, int order)
+{
+    if((*this)[index].size() > 1000){
+        return 0.0f;
+    }else{
+        float result = 0;
+        float p = 1.0f / (*this)[index].size();
+        for(int i = 0; i < (*this)[index].size(); i++){
+        result += std::pow((*this)[index].at(i) - this->MuAt(index), order) * p;
+        }
+        return result / (*this)[index].size();
+    }
+
 }
 
 float DataList::Median(const int index)
 {
-    QVector<float> temporaryVector(this[0][index].length());
-    std::partial_sort_copy(std::begin(this[0][index]), std::end(this[0][index]), std::begin(temporaryVector), std::end(temporaryVector));
+    QVector<float> temporaryVector((*this)[index].length());
+    std::partial_sort_copy(std::begin((*this)[index]), std::end((*this)[index]), std::begin(temporaryVector), std::end(temporaryVector));
     return temporaryVector.at((int)(temporaryVector.length() / 2));
+}
+
+float DataList::MAD(const int index)
+{
+    if((*this)[index].length() <= 1000){
+        QVector<float> tempVector;
+        for(int i = 0; i < (*this)[index].size(); i++){
+            for(int j = i; j < (*this)[index].size() - 1; j++){
+                tempVector.push_back(0.5 * ((*this)[index].at(i) + (*this)[index].at(j)));
+            }
+        }
+        std::sort(tempVector.begin(), tempVector.end());
+        return tempVector[(int)(tempVector.length() / 2)];
+    }else{
+        return 0.0f;
+    }
+
+}
+
+float DataList::ExscessCoef(const int index)
+{
+    float result;
+    float fMoment = this->SigmaAt(index, 4);
+    float sigma = this->SigmaAt(index);
+    result = fMoment / std::pow(sigma, 4);
+    return result;
+}
+
+float DataList::AssymetryCoef(const int index)
+{
+    float thrMoment = this->VariatedMoment(index);
+    float sigma = this->SigmaAt(index);
+    return thrMoment / std::pow(sigma, 3);
+}
+
+QVector<float> DataList::Kvant(const int index)
+{
+    QVector<float> result;
+    float TstKv = 1.64;
+    float Mu = this->MuAt(index);
+    float sigma = this->SigmaAt(index);
+    float ask = this->AssymetryCoef(index);
+    float sqtL = sigma / (*this)[index].size();
+    float qs = sigma / std::sqrt(2 * (*this)[index].size());
+    result.append(Mu - TstKv * sqtL); //results
+    result.append(Mu + TstKv * sqtL);
+    result.append(sigma - TstKv * qs);
+    result.append(sigma + TstKv * qs);
+    //result.append(ask - TestKv  )
+
+    return result;
 }
 
 QVector<float> DataList::GetH()
@@ -123,7 +189,7 @@ QVector<float> DataList::GetH()
     auto Ms = this->GetM();
     for(int i = 0; i < this->_size; i++){
         int m = Ms[i];
-        QVector<float> copiedAndSorted = this[0][i];
+        QVector<float> copiedAndSorted = (*this)[i];
         std::sort(copiedAndSorted.begin(), copiedAndSorted.end());
         h = (copiedAndSorted.last() - copiedAndSorted.first()) / m;
         classsSizes.push_back(h);
@@ -134,7 +200,7 @@ QVector<float> DataList::GetH()
 QVector<float> DataList::GetClassesAt(const int index)
 {
     QVector<float> classes;
-    auto temporaryChecker = this[0][index];
+    auto temporaryChecker = (*this)[index];
     std::sort(temporaryChecker.begin(), temporaryChecker.end());
     float classSizes = this->GetH().at(index);
     int M = this->GetM().at(index);
@@ -152,7 +218,7 @@ QVector<int> DataList::GetM()
 {
     QVector<int> m;
     for(int i = 0; i < this->_size; i++){
-        int currentSize = this[0][i].size();
+        int currentSize = (*this)[i].size();
         if(currentSize <= 100){
             m.push_back((int)std::sqrt(currentSize));
         }else{
@@ -165,12 +231,12 @@ QVector<int> DataList::GetM()
 QVector<float> DataList::histoBulding(const int index)
 {
     QVector<float> result;
-    QVector<float> copiedAndSorted = this[0][index];
+    QVector<float> copiedAndSorted = (*this)[index];
     std::sort(copiedAndSorted.begin(), copiedAndSorted.end());
     auto classes = this->GetClassesAt(index);
     for(int i = 0; i < classes.length(); i++){
         float tempProb = 0;
-        for(int j = 0; j < this[0][index].length(); j++){
+        for(int j = 0; j < (*this)[index].length(); j++){
             if(i != 0){
                 if(copiedAndSorted.at(j) > classes[i-1] && copiedAndSorted.at(j) <= classes[i]){
                     tempProb++;
@@ -181,7 +247,7 @@ QVector<float> DataList::histoBulding(const int index)
                 }
             }
         }
-        result.push_back(tempProb / this[0][index].length());
+        result.push_back(tempProb / (*this)[index].length());
     }
     return result;
 }
